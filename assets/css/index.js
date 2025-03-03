@@ -7,11 +7,16 @@ const cd= $('.cd')
 const playBtn = $('.btn-toggle-play')
 const player = $('.player')
 const progress = $('#progress')
+const nextBtn = $('.btn-next')
+const preBtn = $('.btn-prev')
 
-const playlist = $('.playlist');
+const randomBtn =$('.btn-random')
+
+const playlist = $('.playlist')
 const app = {
     currentIndex: 0,
     isPlaying: false,
+    isRandom: false,
     
     songs: [
         {
@@ -65,7 +70,7 @@ const app = {
         {
             name: 'Đầu đường xó chợ',
             singer: 'Obito ft Lăng LD',
-            path:'./assets/music/TỰHÀOMÀUÁOLÍNH -THÁI HỌC.mp3',
+            path:'./assets/music/Obito-Đầu Đường Xó Chợ ft Lăng LD.mp3',
             image:'./assets/img/dauduongxocho.jpg'
         },
         {
@@ -114,6 +119,19 @@ const app = {
     handleEvents: function(){
         const cdWidth = cd.offsetWidth
         const _this = this
+
+        //Xử lý cd quay và dừng
+        const cdThumbAnimate = cdThumb.animate([
+            {
+                transform: 'rotate(360deg)'
+            }
+        ],{
+            duration: 10000,
+            iterations: Infinity //lặp vô hạn
+        })
+
+        cdThumbAnimate.pause();
+
         //Xử lý phóng to thu nhỏ cd
         document.onscroll = function() {
             const scrollTop =  document.documentElement.scrollTop || window.scrollY;
@@ -138,12 +156,14 @@ const app = {
         audio.onplay = function(){
             _this.isPlaying = true
             player.classList.add('playing')
+            cdThumbAnimate.play();
         }
 
         //Khi song được pause
         audio.onpause = function(){
             _this.isPlaying = false
             player.classList.remove('playing')
+            cdThumbAnimate.pause();
         }
 
         //Khi tiến độ bài hát thay đổi
@@ -154,6 +174,43 @@ const app = {
                 progress.value = progressPercent
             }
         }
+
+        //Xử lý khi tua song
+        progress.onchange =  function(e){
+            
+            const seekTime = audio.duration/100*e.target.value
+            audio.currentTime = seekTime
+        }
+
+        //Khi next song
+        nextBtn.onclick = function(){
+            if(_this.isRandom){
+                _this.playRandomSong()
+            }
+            else{
+                _this.nextSong()
+            }
+            
+            audio.play();
+        }
+
+        //Khi prev song
+        preBtn.onclick = function(){
+            if(_this.isRandom){
+                _this.playRandomSong()
+            }
+            else{
+                _this.prevSong()
+            }
+            audio.play();
+        }
+
+        //random bài hát
+        randomBtn.onclick = function(e){
+            _this.isRandom = !_this.isRandom
+            randomBtn.classList.toggle('active',_this.isRandom)
+            
+        }
     },
     loadCurrentSong: function(){
 
@@ -161,6 +218,33 @@ const app = {
         cdThumb.style.backgroundImage = `url(${this.currentSong.image})`
         audio.src = this.currentSong.path
     },
+
+    nextSong: function() {
+        this.currentIndex++
+        if(this.currentIndex >= this.songs.length){
+            this.currentIndex =0
+        }
+        this.loadCurrentSong()
+    },
+
+    prevSong: function() {
+        this.currentIndex--
+        if(this.currentIndex < 0){
+            this.currentIndex = this.songs.length
+        }
+        this.loadCurrentSong()
+  
+    },
+    playRandomSong: function(){
+        let newIndex
+        do{
+            newIndex = Math.floor(Math.random() * this.songs.length)
+        }while(newIndex === this.currentIndex)
+    
+        this.currentIndex = newIndex;
+        this.loadCurrentSong()
+    },
+
     start: function(){
         //định nghĩa thuộc tính cho Object
         this.defineProperties()
