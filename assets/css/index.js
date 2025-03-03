@@ -211,6 +211,12 @@ const app = {
             randomBtn.classList.toggle('active',_this.isRandom)
             
         }
+
+        //Xử lý next song khi audio ended
+        audio.onended = function() {
+            nextBtn.click();
+        }
+
     },
     loadCurrentSong: function(){
 
