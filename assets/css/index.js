@@ -9,6 +9,7 @@ const player = $('.player')
 const progress = $('#progress')
 const nextBtn = $('.btn-next')
 const preBtn = $('.btn-prev')
+const repeatBtn = $('.btn-repeat')
 
 const randomBtn =$('.btn-random')
 
@@ -17,7 +18,7 @@ const app = {
     currentIndex: 0,
     isPlaying: false,
     isRandom: false,
-    
+    isRepeat: false,
     songs: [
         {
             name: 'Không thể say',
@@ -211,10 +212,21 @@ const app = {
             randomBtn.classList.toggle('active',_this.isRandom)
             
         }
+        
+        //Xử lý sự kiện repeat 
+        repeatBtn.onclick = function(e){
+            _this.isRepeat = !_this.isRepeat
+            repeatBtn.classList.toggle('active',_this.isRepeat)
+                        
+        }
 
         //Xử lý next song khi audio ended
         audio.onended = function() {
-            nextBtn.click();
+            if(_this.isRepeat){
+                audio.play()
+            }else{
+                nextBtn.click();
+            }
         }
 
     },
