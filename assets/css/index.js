@@ -195,6 +195,7 @@ const app = {
             
             audio.play();
             _this.render()
+            _this.scrollToActiveSong()
         }
 
         //Khi prev song
@@ -207,6 +208,8 @@ const app = {
             }
             audio.play();
             _this.render()
+            _this.scrollToActiveSong()
+
         }
 
         //random bài hát
@@ -265,6 +268,15 @@ const app = {
         this.currentIndex = newIndex;
         this.loadCurrentSong()
     },
+    scrollToActiveSong: function(){
+        setTimeout(()=>{
+            $('.song.active').scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            })
+        },300)
+    },
+
 
     start: function(){
         //định nghĩa thuộc tính cho Object
