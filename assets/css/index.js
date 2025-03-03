@@ -91,9 +91,10 @@ const app = {
 
     ],
     render:function(){
-        const htmls = this.songs.map(song =>{
+        const htmls = this.songs.map((song,index) =>{
+            
             return `
-                <div class="song">
+                <div class="song ${index === this.currentIndex ? 'active':''}">
                     <div class="thumb" style="background-image: url('${song.image}')">
                 </div>
                 <div class="body">
@@ -193,6 +194,7 @@ const app = {
             }
             
             audio.play();
+            _this.render()
         }
 
         //Khi prev song
@@ -204,6 +206,7 @@ const app = {
                 _this.prevSong()
             }
             audio.play();
+            _this.render()
         }
 
         //random bài hát
