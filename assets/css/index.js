@@ -1,5 +1,8 @@
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
+
+const PLAYER_STORAGE_KEY ='TNHAN'
+
 const heading = $('header h2')
 const cdThumb = $('.cd-thumb')
 const audio = $('#audio')
@@ -19,6 +22,7 @@ const app = {
     isPlaying: false,
     isRandom: false,
     isRepeat: false,
+    config: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY) || "{}"),
     songs: [
         {
             name: 'Không thể say',
@@ -90,11 +94,16 @@ const app = {
 
 
     ],
+    setConfig: function(key,value){
+        this.config[key] = value
+        localStorage.setItem(PLAYER_STORAGE_KEY,this.config)
+    },
+    
     render:function(){
         const htmls = this.songs.map((song,index) =>{
             
             return `
-                <div class="song ${index === this.currentIndex ? 'active':''}">
+                <div class="song ${index === this.currentIndex ? 'active':''}" data-index=${index}>
                     <div class="thumb" style="background-image: url('${song.image}')">
                 </div>
                 <div class="body">
@@ -108,7 +117,7 @@ const app = {
 
             `
         }) 
-        $('.playlist').innerHTML = htmls.join("");
+        playlist.innerHTML = htmls.join("");
     },
     defineProperties: function(){
         Object.defineProperty(this,'currentSong',{
@@ -215,6 +224,7 @@ const app = {
         //random bài hát
         randomBtn.onclick = function(e){
             _this.isRandom = !_this.isRandom
+            _this.setConfig('isRandom', _this.isRandom)
             randomBtn.classList.toggle('active',_this.isRandom)
             
         }
@@ -222,6 +232,7 @@ const app = {
         //Xử lý sự kiện repeat 
         repeatBtn.onclick = function(e){
             _this.isRepeat = !_this.isRepeat
+            _this.setConfig('isRepeat', _this.isRepeat)
             repeatBtn.classList.toggle('active',_this.isRepeat)
                         
         }
@@ -235,6 +246,22 @@ const app = {
             }
         }
 
+        //lắng nghe click vào playlist
+        playlist.onclick = function(e){
+            const songNode = e.target.closest('.song:not(.active)') 
+            if(songNode|| e.target.closest('.option')){
+                //Xử lý click vào song
+                if(e.target.closest('.song:not(.active)')){
+                    _this.currentIndex = Number(songNode.dataset.index)
+                    _this.loadCurrentSong()
+                    audio.play()
+                    _this.render()
+                }
+
+                //xử lý click vào option
+                if(e.target.closest('.option')){}
+            }
+        }
     },
     loadCurrentSong: function(){
 
